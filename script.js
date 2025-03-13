@@ -5,6 +5,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let draggedItem = null;
     let columnCount = 3;
+    
+    // Add a class to the dragged item for styling
+    function addDraggingClass(item) {
+        item.classList.add('dragging');
+    }
+    
+    function removeDraggingClass(item) {
+        item.classList.remove('dragging');
+    }
 
     function getDragAfterElement(container, y) {
         const draggableElements = [...container.querySelectorAll('.kanban-item:not(.dragging)')];
@@ -23,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function addDragListeners(item) {
         item.addEventListener('dragstart', function() {
             draggedItem = this;
+            addDraggingClass(this);
             setTimeout(() => {
                 this.style.display = 'none';
             }, 0);
@@ -31,8 +41,33 @@ document.addEventListener('DOMContentLoaded', function() {
         item.addEventListener('dragend', function() {
             setTimeout(() => {
                 this.style.display = 'block';
+                removeDraggingClass(this);
                 draggedItem = null;
             }, 0);
+        });
+    }
+    
+    // Add event listeners to all columns for drag and drop functionality
+    function setupColumnDragEvents() {
+        const itemsContainers = document.querySelectorAll('.kanban-items');
+        
+        itemsContainers.forEach(container => {
+            // When an item is dragged over a container
+            container.addEventListener('dragover', function(e) {
+                e.preventDefault(); // Allow drop
+                const afterElement = getDragAfterElement(container, e.clientY);
+                
+                if (afterElement == null) {
+                    container.appendChild(draggedItem);
+                } else {
+                    container.insertBefore(draggedItem, afterElement);
+                }
+            });
+            
+            // When an item is dropped in a container
+            container.addEventListener('drop', function(e) {
+                e.preventDefault();
+            });
         });
     }
 
@@ -175,4 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     items.forEach(item => {
         addDragListeners(item);
     });
+    
+    // Setup drag and drop events for columns
+    setupColumnDragEvents();
 });
