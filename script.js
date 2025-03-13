@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 taskTextElement.appendChild(inputElement);
                 inputElement.focus();
 
-                inputElement.addEventListener('blur', function() {
+                taskTextElement.addEventListener('blur', function() {
                     taskTextElement.textContent = inputElement.value;
                 });
             });
@@ -90,30 +90,87 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    columns.forEach(column => {
-        column.addEventListener('dragover', function(e) {
-            e.preventDefault();
-        });
+    const saveButton = document.getElementById('save-button');
 
-        column.addEventListener('dragenter', function(e) {
-            e.preventDefault();
-            this.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+    saveButton.addEventListener('click', function() {
+        const kanbanData = [];
+        columns.forEach(column => {
+            const columnId = column.id;
+            const items = Array.from(column.querySelectorAll('.kanban-item')).map(item => {
+                const taskTextElement = item.querySelector('span');
+                const taskText = taskTextElement.textContent;
+                const taskColor = item.style.backgroundColor;
+                return {
+                    text: taskText,
+                    color: taskColor
+                };
+            });
+            kanbanData.push({
+                columnId: columnId,
+                items: items
+            });
         });
-
-        column.addEventListener('dragleave', function() {
-            this.style.backgroundColor = 'white';
-        });
-
-        column.addEventListener('drop', function(e) {
-            this.style.backgroundColor = 'white';
-            const afterElement = getDragAfterElement(this.querySelector('.kanban-items'), e.clientY);
-            if (afterElement == null) {
-                this.querySelector('.kanban-items').appendChild(draggedItem);
-            } else {
-                this.querySelector('.kanban-items').insertBefore(draggedItem, afterElement);
-            }
-        });
+        localStorage.setItem('kanbanData', JSON.stringify(kanbanData));
     });
+
+    function loadKanbanData() {
+        const kanbanData = localStorage.getItem('kanbanData');
+        if (kanbanData) {
+            const parsedData = JSON.parse(kanbanData);
+            parsedData.forEach(columnData => {
+                const column = document.getElementById(columnData.columnId);
+                const itemsContainer = column.querySelector('.kanban-items');
+                columnData.items.forEach(itemData => {
+                    const newItem = document.createElement('div');
+                    newItem.classList.add('kanban-item');
+                    newItem.setAttribute('draggable', 'true');
+
+                    const taskTextElement = document.createElement('span');
+                    taskTextElement.textContent = itemData.text;
+                    newItem.appendChild(taskTextElement);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.classList.add('delete-button');
+                    newItem.appendChild(deleteButton);
+
+                    deleteButton.addEventListener('click', function() {
+                        newItem.remove();
+                    });
+
+                    const colorButton = document.createElement('input');
+                    colorButton.type = 'color';
+                    colorButton.classList.add('color-button');
+                    newItem.appendChild(colorButton);
+                    newItem.style.backgroundColor = itemData.color;
+
+                    colorButton.addEventListener('change', function() {
+                        newItem.style.backgroundColor = colorButton.value;
+                    });
+
+                    taskTextElement.addEventListener('click', function() {
+                        const currentText = taskTextElement.textContent;
+                        const inputElement = document.createElement('input');
+                        inputElement.type = 'text';
+                        inputElement.value = currentText;
+
+                        taskTextElement.textContent = '';
+                        taskTextElement.appendChild(inputElement);
+                        inputElement.focus();
+
+                        inputElement.addEventListener('blur', function() {
+                            taskTextElement.textContent = inputElement.value;
+                        });
+                    });
+
+                    addDragListeners(newItem);
+                    itemsContainer.appendChild(newItem);
+                });
+            });
+        }
+    }
+
+    loadKanbanData();
 
     items.forEach(item => {
         addDragListeners(item);
