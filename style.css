@@ -4,12 +4,16 @@ body {
     padding: 0;
     background-color: #e9ebee;
     color: #333;
+    height: 100vh; /* Make body fill the entire viewport height */
+    overflow: hidden; /* Prevent scrollbars */
 }
 
 .kanban {
     display: flex;
     overflow-x: auto;
     padding: 30px;
+    height: auto; /* Adjust height to account for padding */
+    min-height: calc(100vh - 120px);
 }
 
 .kanban-column {
@@ -56,22 +60,6 @@ body {
     background-color: #eee;
 }
 
-.kanban-item button {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    float: right;
-    margin-left: 5px;
-    font-size: 0.8em;
-}
-
-.kanban-item button:hover {
-    background-color: #c0392b;
-}
-
 .add-task {
     text-align: center;
     margin-top: 20px;
@@ -97,4 +85,20 @@ body {
 
 .add-task button:hover {
     background-color: #2980b9;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    margin-left: 5px;
+    font-size: 0.8em;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
 }

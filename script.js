@@ -5,6 +5,35 @@ document.addEventListener('DOMContentLoaded', function() {
     let draggedItem = null;
 
     items.forEach(item => {
+        const taskTextElement = document.createElement('span');
+        taskTextElement.textContent = item.textContent;
+        item.textContent = '';
+        item.appendChild(taskTextElement);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
+        item.appendChild(deleteButton);
+
+        deleteButton.addEventListener('click', function() {
+            item.remove();
+        });
+
+        taskTextElement.addEventListener('click', function() {
+            const currentText = taskTextElement.textContent;
+            const inputElement = document.createElement('input');
+            inputElement.type = 'text';
+            inputElement.value = currentText;
+
+            taskTextElement.textContent = '';
+            taskTextElement.appendChild(inputElement);
+            inputElement.focus();
+
+            inputElement.addEventListener('blur', function() {
+                taskTextElement.textContent = inputElement.value;
+            });
+        });
+
         item.addEventListener('dragstart', function() {
             draggedItem = this;
             setTimeout(() => {
@@ -17,18 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.display = 'block';
                 draggedItem = null;
             }, 0);
-        });
-
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        item.appendChild(editButton);
-
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        item.appendChild(deleteButton);
-
-        deleteButton.addEventListener('click', function() {
-            item.remove();
         });
     });
 
@@ -43,16 +60,33 @@ document.addEventListener('DOMContentLoaded', function() {
             newItem.setAttribute('draggable', 'true');
             newItem.textContent = taskText;
 
-            const editButton = document.createElement('button');
-            editButton.textContent = 'Edit';
-            newItem.appendChild(editButton);
+            const taskTextElement = document.createElement('span');
+            taskTextElement.textContent = newItem.textContent;
+            newItem.textContent = '';
+            newItem.appendChild(taskTextElement);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-button');
             newItem.appendChild(deleteButton);
 
             deleteButton.addEventListener('click', function() {
                 newItem.remove();
+            });
+
+             taskTextElement.addEventListener('click', function() {
+                const currentText = taskTextElement.textContent;
+                const inputElement = document.createElement('input');
+                inputElement.type = 'text';
+                inputElement.value = currentText;
+
+                taskTextElement.textContent = '';
+                taskTextElement.appendChild(inputElement);
+                inputElement.focus();
+
+                inputElement.addEventListener('blur', function() {
+                    taskTextElement.textContent = inputElement.value;
+                });
             });
 
             newItem.addEventListener('dragstart', function() {
