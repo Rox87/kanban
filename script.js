@@ -19,6 +19,15 @@ document.addEventListener('DOMContentLoaded', function() {
             item.remove();
         });
 
+        const colorButton = document.createElement('input');
+        colorButton.type = 'color';
+        colorButton.classList.add('color-button');
+        item.appendChild(colorButton);
+
+        colorButton.addEventListener('change', function() {
+            item.style.backgroundColor = colorButton.value;
+        });
+
         taskTextElement.addEventListener('click', function() {
             const currentText = taskTextElement.textContent;
             const inputElement = document.createElement('input');
